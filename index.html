@@ -18,9 +18,11 @@
         }
 
         body, html { 
-            margin: 0; padding: 0; height: 100%; 
+            margin: 0; padding: 0; 
+            height: 100vh; width: 100vw;
             background: #000; color: #fff; 
-            font-family: 'Cairo', sans-serif; overflow: hidden;
+            font-family: 'Cairo', sans-serif; 
+            overflow: hidden;
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
         }
@@ -32,27 +34,35 @@
         }
 
         .scroll-engine {
-            height: 100vh; overflow-y: scroll; 
-            scroll-snap-type: y mandatory; scrollbar-width: none;
+            height: 100vh; width: 100vw;
+            overflow-y: scroll; 
+            scroll-snap-type: y mandatory; 
+            scrollbar-width: none;
             position: relative; z-index: 1;
         }
         .scroll-engine::-webkit-scrollbar { display: none; }
 
+        /* تعديل الحاوية لتطابق أبعاد الشاشة تماماً */
         .v-realm { 
-            height: 100vh; width: 100vw; scroll-snap-align: start; 
+            height: 100vh; width: 100vw; 
+            scroll-snap-align: start; 
             position: relative; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
 
+        /* تعديل الفيديو ليملأ المساحة (Matching the layout) */
         video { 
-            width: 100%; height: 100%; object-fit: cover;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%; 
+            object-fit: cover; /* لضمان ملء الشاشة بدون فراغات */
             transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1s;
             filter: brightness(0.8);
         }
 
         .v-realm.active video { filter: brightness(1.1); transform: scale(1.02); }
 
-        /* العلامة المائية العمودية الراقية */
+        /* العلامة المائية العمودية */
         .side-watermark {
             position: fixed; top: 120px; left: 35px;
             z-index: 1000; pointer-events: none;
@@ -64,7 +74,7 @@
             transition: all 0.5s;
         }
 
-        /* القائمة الجانبية المتوهجة */
+        /* القائمة الجانبية */
         .sidebar-actions {
             position: absolute; left: 25px; top: 55%;
             transform: translateY(-50%);
@@ -76,7 +86,7 @@
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%; /* شكل دائري أكثر عصرية */
+            border-radius: 50%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.4s all;
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
@@ -89,7 +99,7 @@
         .action-node i { font-size: 18px; color: #fff; transition: 0.3s; }
         .action-node span { font-size: 9px; margin-top: 3px; font-weight: 700; color: var(--accent); }
 
-        /* الهيدر الزجاجي */
+        /* الهيدر */
         .badge-glass {
             background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(15px);
             padding: 10px 25px; border-radius: 50px; 
@@ -99,7 +109,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* ناف بار سفلي عائم */
+        /* ناف بار سفلي */
         nav {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 280px; height: 70px;
@@ -117,9 +127,8 @@
             font-size: 22px; transition: 0.4s;
             box-shadow: 0 0 20px var(--glow);
         }
-        #up-trigger:hover { transform: rotate(90deg) scale(1.1); }
 
-        /* لوحة التحكم الاحترافية */
+        /* لوحة التحكم */
         #admin-panel {
             position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000;
             display: none; flex-direction: column; padding: 50px 20px;
@@ -128,7 +137,6 @@
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
             padding: 15px; border-radius: 25px; transition: 0.3s;
         }
-        .admin-card:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); }
         .admin-thumb { width: 70px; height: 70px; border-radius: 15px; object-fit: cover; }
     </style>
 </head>
@@ -178,7 +186,6 @@
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
 
-        // تحديث الوقت
         setInterval(() => { 
             const now = new Date();
             document.getElementById('clock').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0'); 
