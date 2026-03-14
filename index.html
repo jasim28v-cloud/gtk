@@ -3,200 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AURORA ELITE | PRESTIGE V8</title>
+    <title>AETHER REALM | V12 PRESTIGE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;900&family=Cairo:wght@300;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;900&family=Cairo:wght@200;600&display=swap');
         
         :root {
-            --aurora-1: #00d2ff;
-            --aurora-2: #92fe9d;
-            --glass: rgba(255, 255, 255, 0.05);
+            --accent: #ffffff;
+            --ethereal-glow: rgba(0, 255, 255, 0.4);
+            --glass-blur: blur(25px);
         }
 
         body, html { 
             margin: 0; padding: 0; height: 100%; 
             background: #000; color: #fff; 
             font-family: 'Cairo', sans-serif; overflow: hidden;
-            user-select: none;
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
 
-        /* محرك التمرير */
+        /* محرك التمرير الكوني */
         .scroll-engine {
             height: 100vh; overflow-y: scroll; 
             scroll-snap-type: y mandatory; scrollbar-width: none;
         }
         .scroll-engine::-webkit-scrollbar { display: none; }
 
-        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
-        video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.8); }
+        .v-realm { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
+        video { width: 100%; height: 100%; object-fit: cover; transition: 1.2s cubic-bezier(0.23, 1, 0.32, 1); }
 
-        /* العلامة المائية المتحركة المذهلة */
-        .animated-watermark {
+        /* العلامة المائية: Dimensional Ghost (المنتصف) */
+        .ghost-watermark {
             position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10; pointer-events: none;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.5rem; font-weight: 900;
-            letter-spacing: 15px; text-transform: uppercase;
+            transform: translate(-50%, -50%) perspective(1000px);
+            z-index: 20; pointer-events: none;
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.5rem, 8vw, 3rem); font-weight: 900;
+            letter-spacing: 25px; text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.08);
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            animation: ghost-float 8s ease-in-out infinite;
             white-space: nowrap;
-            background: linear-gradient(90deg, #fff, var(--aurora-1), var(--aurora-2), #fff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            opacity: 0.2;
-            animation: aurora-text 5s linear infinite, float 6s ease-in-out infinite;
         }
 
-        @keyframes aurora-text {
-            to { background-position: 200% center; }
-        }
-        @keyframes float {
-            0%, 100% { transform: translate(-50%, -55%); }
-            50% { transform: translate(-50%, -45%); }
+        @keyframes ghost-float {
+            0%, 100% { transform: translate(-50%, -50%) rotateY(0deg) scale(1); opacity: 0.08; }
+            50% { transform: translate(-50%, -60%) rotateY(15deg) scale(1.05); opacity: 0.15; color: #00ffff; }
         }
 
-        /* أزرار التفاعل الزجاجية الناعمة على اليسار */
-        .sidebar-left {
+        /* أزرار السائل الكريستالي (اليسار) */
+        .sidebar-liquid {
             position: absolute; left: 25px; top: 50%;
             transform: translateY(-50%);
             display: flex; flex-direction: column; gap: 20px; z-index: 100;
         }
 
-        .glass-btn {
-            width: 58px; height: 58px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
+        .liquid-node {
+            width: 62px; height: 62px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.4s all;
+            cursor: pointer; transition: 0.5s all cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glass-btn:hover {
-            background: rgba(255,255,255,0.15);
-            border-color: var(--aurora-1);
-            transform: scale(1.1);
-        }
-        .glass-btn i { font-size: 22px; color: rgba(255,255,255,0.8); }
-        .glass-btn span { font-size: 11px; margin-top: 2px; font-weight: bold; color: var(--aurora-1); }
 
-        /* تفاصيل الفيديو */
-        .v-info {
-            position: absolute; bottom: 130px; left: 100px; right: 30px;
-            z-index: 50; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        .liquid-node:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #00ffff;
+            transform: translateX(5px) scale(1.1);
+            box-shadow: -10px 0 30px rgba(0, 255, 255, 0.2);
         }
-        .v-author { font-family: 'Montserrat'; font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; }
 
-        /* شريط التنقل السفلي الفخم */
+        .liquid-node i { font-size: 22px; color: #fff; opacity: 0.7; }
+        .liquid-node span { font-size: 10px; margin-top: 4px; font-weight: bold; color: #00ffff; letter-spacing: 1px; }
+
+        /* تفاصيل المقطع */
+        .realm-meta {
+            position: absolute; bottom: 130px; left: 105px; right: 40px;
+            z-index: 50;
+        }
+        .v-owner { font-family: 'Cinzel'; font-weight: 900; font-size: 1.3rem; letter-spacing: 3px; color: #fff; }
+
+        /* شريط التنقل السفلي الفاخر */
         nav {
-            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 420px; height: 85px;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255,255,255,0.1);
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 450px; height: 85px;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 30px; display: flex; justify-content: space-around;
             align-items: center; z-index: 500;
         }
 
-        #up-btn {
-            width: 65px; height: 65px;
+        #direct-upload {
+            width: 70px; height: 70px;
             background: #fff; color: #000;
-            border-radius: 20px; display: flex; align-items: center; justify-content: center;
-            font-size: 28px; box-shadow: 0 0 30px rgba(255,255,255,0.2);
-            transition: 0.4s;
+            border-radius: 22px; display: flex; align-items: center; justify-content: center;
+            font-size: 30px; transition: 0.5s;
+            box-shadow: 0 15px 40px rgba(255,255,255,0.2);
         }
-        #up-btn:hover { transform: scale(1.1) rotate(90deg); border-radius: 50%; }
+        #direct-upload:hover { transform: scale(1.1) rotate(90deg); border-radius: 35px; background: #00ffff; }
 
-        /* هيدر علوي ناعم */
-        header {
-            position: fixed; top: 30px; left: 0; width: 100%;
-            display: flex; justify-content: space-between; padding: 0 30px;
+        /* هيدر الأثير */
+        .aether-header {
+            position: fixed; top: 40px; width: 100%;
+            display: flex; justify-content: space-between; padding: 0 40px;
             z-index: 1000; pointer-events: none;
         }
-        .status-badge {
-            background: var(--glass); backdrop-filter: blur(10px);
-            padding: 8px 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);
-            font-family: 'Montserrat'; font-weight: 900; font-size: 14px; color: var(--aurora-1);
-            pointer-events: auto;
+        .badge-glass {
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(15px);
+            padding: 10px 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Cinzel'; font-size: 12px; font-weight: 900; color: #00ffff;
+            pointer-events: auto; letter-spacing: 4px;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="status-badge">AURORA ELITE</div>
-        <div class="status-badge" style="color:#fff" id="clock">00:00</div>
-    </header>
+    <div class="aether-header">
+        <div class="badge-glass">AETHER_V12</div>
+        <div class="badge-glass" style="color:#fff" id="live-timer">00:00</div>
+    </div>
 
-    <main class="scroll-engine" id="video-feed"></main>
+    <main class="scroll-engine" id="realm-stack"></main>
 
     <nav>
-        <i class="fas fa-fingerprint text-2xl opacity-30 hover:opacity-100 cursor-pointer" onclick="checkAdmin()"></i>
-        <div id="up-btn"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-comment-dots text-2xl opacity-30 hover:opacity-100 cursor-pointer text-cyan-400" onclick="openAd(); toggleChat()"></i>
+        <i class="fas fa-fingerprint text-2xl opacity-20 hover:opacity-100 cursor-pointer transition" onclick="checkAdmin()"></i>
+        <div id="direct-upload">
+            <i class="fas fa-plus"></i>
+        </div>
+        <i class="fas fa-wind text-2xl opacity-20 hover:opacity-100 cursor-pointer text-cyan-400 transition" onclick="toggleChat()"></i>
     </nav>
 
-    <div id="chat-ov" class="fixed inset-0 z-[600] bg-black/90 backdrop-blur-3xl hidden flex-col p-10 animate-fade-in">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Montserrat] tracking-[8px] text-white/50 text-xl">SYSTEM_FEED</h2>
-            <i class="fas fa-times text-3xl cursor-pointer opacity-30 hover:opacity-100" onclick="toggleChat()"></i>
+    <div id="chat-ov" class="fixed inset-0 z-[600] bg-black/98 backdrop-blur-3xl hidden flex-col p-12">
+        <div class="flex justify-between items-center mb-12">
+            <h2 class="font-[Cinzel] tracking-[15px] text-white/30 text-2xl">REALM_TALK</h2>
+            <i class="fas fa-times text-4xl cursor-pointer opacity-30 hover:opacity-100" onclick="toggleChat()"></i>
         </div>
-        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
-        <div class="mt-8 flex gap-3 p-3 bg-white/5 rounded-2xl border border-white/10">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-sm" placeholder="أدخل بيانات الرسالة...">
-            <button onclick="sendMsg()" class="bg-white text-black px-8 py-3 rounded-xl font-black text-sm">إرسال</button>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-8"></div>
+        <div class="mt-8 flex gap-4 p-5 bg-white/5 rounded-3xl border border-white/10">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-lg" placeholder="Send pulse...">
+            <button onclick="sendMsg()" class="bg-white text-black px-12 py-5 rounded-2xl font-black">EMIT</button>
         </div>
     </div>
 
     <script>
         const MASTER_KEY = "1234";
-        const AD_LINK = "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec";
+        const AD_URL = "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec";
 
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
 
-        function openAd() { window.open(AD_LINK, '_blank'); }
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}); }, 1000);
+        function openAd() { window.open(AD_URL, '_blank'); }
+        setInterval(() => { 
+            const now = new Date();
+            document.getElementById('live-timer').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0'); 
+        }, 1000);
 
         db.ref('vox_god_content').on('value', snap => {
-            const container = document.getElementById('video-feed');
-            container.innerHTML = '';
+            const stack = document.getElementById('realm-stack');
+            stack.innerHTML = '';
             const data = snap.val();
             if(!data) return;
 
             Object.keys(data).reverse().forEach(id => {
                 const v = data[id];
                 const section = document.createElement('section');
-                section.className = 'v-seg';
+                section.className = 'v-realm';
                 section.innerHTML = `
-                    <div class="animated-watermark">AURORA ELITE</div>
+                    <div class="ghost-watermark">AETHER REALM</div>
                     <video id="vid-${id}" loop playsinline src="${v.url}" onclick="this.paused?this.play():this.pause()"></video>
                     
-                    <div class="sidebar-left">
-                        <div class="glass-btn" onclick="toggleMute(this, '${id}')">
+                    <div class="sidebar-liquid">
+                        <div class="liquid-node" onclick="toggleMute(this, '${id}')">
                             <i class="fas fa-volume-up"></i>
                         </div>
-                        <div class="glass-btn" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
-                            <i class="fas fa-heart text-red-500"></i>
+                        <div class="liquid-node" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
+                            <i class="fas fa-fire-alt text-orange-500"></i>
                             <span>${v.likes || 0}</span>
                         </div>
-                        <div class="glass-btn" onclick="openAd(); toggleChat()">
-                            <i class="fas fa-comment"></i>
+                        <div class="liquid-node" onclick="openAd(); toggleChat()">
+                            <i class="fas fa-comment-dots"></i>
                         </div>
-                        <div class="glass-btn" onclick="openAd(); navigator.share({url:window.location.href})">
-                            <i class="fas fa-paper-plane"></i>
+                        <div class="liquid-node" onclick="openAd(); navigator.share({url:window.location.href})">
+                            <i class="fas fa-expand"></i>
                         </div>
                     </div>
 
-                    <div class="v-info">
-                        <div class="v-author">@AURORA_USER_${id.substring(1,5)}</div>
-                        <div class="text-white/40 text-sm mt-1">Premium Aurora Content Delivery</div>
+                    <div class="realm-meta">
+                        <div class="v-owner">@AETHER_SOUL_${id.substring(1,6)}</div>
+                        <div class="text-white/20 text-xs mt-2 font-bold tracking-[4px]">V12 QUANTUM STREAMING SYSTEM</div>
                     </div>
                 `;
-                container.appendChild(section);
+                stack.appendChild(section);
             });
             initObserver();
         });
@@ -207,18 +209,32 @@
             btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
         }
 
+        // تحسين عملية الرفع لتكون مباشرة وبسيطة
         const myWidget = cloudinary.createUploadWidget({ 
-            cloudName: "dqzjfaqg4", uploadPreset: "vox_god",
-            styles: { palette: { window: "#000000", windowBorder: "#ffffff", tabIcon: "#ffffff", action: "#ffffff", textDark: "#000000", textLight: "#ffffff" } }
+            cloudName: "dqzjfaqg4", 
+            uploadPreset: "vox_god",
+            sources: ['local'], // يركز فقط على الاستوديو المحلي لسرعة الوصول
+            multiple: false,
+            clientAllowedFormats: ["video"],
+            maxVideoFileSize: 100000000, // 100MB
+            styles: {
+                palette: {
+                    window: "#000000", windowBorder: "#00ffff", tabIcon: "#00ffff",
+                    menuIcons: "#ffffff", textLight: "#ffffff", textDark: "#000000",
+                    action: "#00ffff", inactiveTabIcon: "#444444", error: "#ff0000",
+                    inProgress: "#00ffff", complete: "#33ff00", sourceBg: "#000000"
+                }
+            }
         }, (err, res) => {
             if (res.event === "success") {
                 db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
             }
         });
-        document.getElementById("up-btn").onclick = () => myWidget.open();
+
+        document.getElementById("direct-upload").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("ACCESS KEY") === MASTER_KEY) alert("Admin Mode Active"); }
+        function checkAdmin() { if(prompt("MASTER_CORE_KEY") === MASTER_KEY) alert("CORE_ACCESSED"); }
         
         function sendMsg() {
             const inp = document.getElementById('msg-input');
@@ -227,7 +243,7 @@
 
         db.ref('vox_chat').limitToLast(15).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => { box.innerHTML += `<div class="p-4 bg-white/5 rounded-2xl border-l-4 border-cyan-500"><p class="text-sm opacity-80">${m.val().text}</p></div>`; });
+            s.forEach(m => { box.innerHTML += `<div class="p-6 bg-white/5 rounded-3xl border-l-4 border-cyan-500 animate-pulse-slow"><p class="text-lg opacity-80">${m.val().text}</p></div>`; });
             box.scrollTop = box.scrollHeight;
         });
 
@@ -235,11 +251,11 @@
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) v.play().catch(()=>{});
-                    else { v.pause(); v.currentTime = 0; }
+                    if(e.isIntersecting) { v.play().catch(()=>{}); e.target.style.filter = "brightness(1.1) contrast(1.1)"; }
+                    else { v.pause(); v.currentTime = 0; e.target.style.filter = "brightness(0.3) blur(5px)"; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
+            document.querySelectorAll('.v-realm').forEach(s => obs.observe(s));
         }
     </script>
 </body>
