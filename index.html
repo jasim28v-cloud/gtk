@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AETHER REALM | V13 PRESTIGE</title>
+    <title>AETHER REALM | PRESTIGE V14</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -13,9 +13,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;900&family=Cairo:wght@200;600&display=swap');
         
         :root {
-            --accent: #ffffff;
-            --ethereal-glow: rgba(0, 255, 255, 0.4);
-            --glass-blur: blur(25px);
+            --accent: #00ffff;
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
         body, html { 
@@ -32,159 +31,157 @@
         .scroll-engine::-webkit-scrollbar { display: none; }
 
         .v-realm { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
-        video { width: 100%; height: 100%; object-fit: cover; transition: 1.2s cubic-bezier(0.23, 1, 0.32, 1); }
+        video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* العلامة المائية الشفافة الفاخرة */
-        .ghost-watermark {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%) perspective(1000px);
-            z-index: 20; pointer-events: none;
+        /* العلامة المائية الجديدة (يسار أسفل الهيدر) */
+        .side-watermark {
+            position: fixed; top: 85px; left: 40px;
+            z-index: 1000; pointer-events: none;
             font-family: 'Cinzel', serif;
-            font-size: clamp(1.2rem, 7vw, 2.5rem); font-weight: 900;
-            letter-spacing: 20px; text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.03); /* شفافية عالية جداً */
-            border: 1px solid rgba(255, 255, 255, 0.01);
-            animation: ghost-float 8s ease-in-out infinite;
-            white-space: nowrap;
+            font-size: 10px; font-weight: 900;
+            letter-spacing: 5px; text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.2);
+            writing-mode: vertical-lr; /* جعلها رأسية لتعطي طابعاً فنياً */
+            transform: rotate(180deg);
         }
 
-        @keyframes ghost-float {
-            0%, 100% { transform: translate(-50%, -50%) rotateY(0deg); opacity: 0.05; }
-            50% { transform: translate(-50%, -55%) rotateY(10deg); opacity: 0.1; color: rgba(0, 255, 255, 0.2); }
-        }
-
-        .sidebar-liquid {
+        /* القائمة الجانبية (الأزرار) */
+        .sidebar-actions {
             position: absolute; left: 25px; top: 50%;
             transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 20px; z-index: 100;
+            display: flex; flex-direction: column; gap: 18px; z-index: 100;
         }
 
-        .liquid-node {
-            width: 60px; height: 60px;
-            background: rgba(255, 255, 255, 0.02);
+        .action-node {
+            width: 58px; height: 58px;
+            background: var(--glass);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.4s all;
+            cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .liquid-node:hover { background: rgba(255, 255, 255, 0.1); border-color: #00ffff; transform: scale(1.1); }
+        .action-node:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent); transform: scale(1.1); }
+        .action-node i { font-size: 20px; color: #fff; opacity: 0.8; }
+        .action-node span { font-size: 10px; margin-top: 4px; font-weight: bold; color: var(--accent); }
 
-        .realm-meta { position: absolute; bottom: 140px; left: 100px; right: 40px; z-index: 50; }
-        .v-owner { font-family: 'Cinzel'; font-weight: 900; font-size: 1.2rem; color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
-
-        /* تعديل النوافذ السفلية (شفافية أكثر وموقع أنزل) */
+        /* شريط التنقل السفلي */
         nav {
-            position: fixed; bottom: 25px; /* تم إنزاله للأسفل */
-            left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 85%; max-width: 420px; height: 75px;
-            background: rgba(255, 255, 255, 0.03); /* زيادة الشفافية */
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 25px; display: flex; justify-content: space-around;
             align-items: center; z-index: 500;
         }
 
-        #direct-upload {
+        #up-trigger {
             width: 60px; height: 60px;
             background: rgba(255, 255, 255, 0.9); color: #000;
             border-radius: 18px; display: flex; align-items: center; justify-content: center;
             font-size: 24px; transition: 0.4s;
         }
 
-        /* لوحة التحكم (Admin Panel) */
+        /* لوحة التحكم الإدارية */
         #admin-panel {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
-            display: none; flex-direction: column; padding: 40px; backdrop-filter: blur(20px);
-        }
-
-        .admin-item {
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000;
+            display: none; flex-direction: column; padding: 40px; backdrop-filter: blur(30px);
         }
 
         .badge-glass {
             background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
-            padding: 8px 20px; border-radius: 15px; font-family: 'Cinzel'; font-size: 11px; color: #00ffff;
+            padding: 8px 20px; border-radius: 15px; font-family: 'Cinzel'; font-size: 11px; color: var(--accent);
+            letter-spacing: 3px;
         }
     </style>
 </head>
 <body>
 
+    <div class="side-watermark">AETHER REALM SYSTEM</div>
+
     <div id="admin-panel">
         <div class="flex justify-between items-center mb-10">
-            <h1 class="text-2xl font-[Cinzel]">CORE_CONTROL</h1>
-            <button onclick="toggleAdmin()" class="text-white opacity-50"><i class="fas fa-times text-2xl"></i></button>
+            <h1 class="text-2xl font-[Cinzel] tracking-widest">SYSTEM_ADMIN</h1>
+            <button onclick="toggleAdmin()" class="text-white opacity-40 hover:opacity-100"><i class="fas fa-times text-2xl"></i></button>
         </div>
-        <div id="admin-list" class="flex-1 overflow-y-auto"></div>
+        <div id="admin-list" class="flex-1 overflow-y-auto space-y-3"></div>
     </div>
 
     <header class="fixed top-10 w-full flex justify-between px-10 z-[1000] pointer-events-none">
-        <div class="badge-glass pointer-events-auto">AETHER_V13</div>
-        <div class="badge-glass" id="live-timer" style="color:white">00:00</div>
+        <div class="badge-glass pointer-events-auto">AETHER_V14</div>
+        <div class="badge-glass" id="clock" style="color:white">00:00</div>
     </header>
 
-    <main class="scroll-engine" id="realm-stack"></main>
+    <main class="scroll-engine" id="video-feed"></main>
 
     <nav>
-        <i class="fas fa-shield-halved text-xl opacity-20 hover:opacity-100 cursor-pointer" onclick="checkAdmin()"></i>
-        <div id="direct-upload"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-comment-alt text-xl opacity-20 hover:opacity-100 cursor-pointer text-cyan-400" onclick="toggleChat()"></i>
+        <i class="fas fa-fingerprint text-xl opacity-20 hover:opacity-100 cursor-pointer" onclick="checkAdmin()"></i>
+        <div id="up-trigger"><i class="fas fa-plus"></i></div>
+        <i class="fas fa-bullseye text-xl opacity-20 hover:opacity-100 cursor-pointer text-cyan-400" onclick="toggleChat()"></i>
     </nav>
 
     <div id="chat-ov" class="fixed inset-0 z-[600] bg-black/98 backdrop-blur-3xl hidden flex-col p-10">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Cinzel] tracking-[10px] text-white/30">AETHER_CHAT</h2>
+            <h2 class="font-[Cinzel] tracking-[10px] text-white/30">REALM_PULSE</h2>
             <i class="fas fa-times text-3xl cursor-pointer opacity-30" onclick="toggleChat()"></i>
         </div>
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
         <div class="mt-5 flex gap-3 p-3 bg-white/5 rounded-2xl border border-white/10">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4" placeholder="Send pulse...">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4" placeholder="Transmit message...">
             <button onclick="sendMsg()" class="bg-white text-black px-8 py-3 rounded-xl font-bold">SEND</button>
         </div>
     </div>
 
     <script>
         const MASTER_KEY = "1234";
+        const AD_LINK = "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec";
+
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
 
         setInterval(() => { 
             const now = new Date();
-            document.getElementById('live-timer').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0'); 
+            document.getElementById('clock').innerText = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0'); 
         }, 1000);
 
         db.ref('vox_god_content').on('value', snap => {
-            const stack = document.getElementById('realm-stack');
+            const feed = document.getElementById('video-feed');
             const adminList = document.getElementById('admin-list');
-            stack.innerHTML = ''; adminList.innerHTML = '';
+            feed.innerHTML = ''; adminList.innerHTML = '';
             const data = snap.val();
             if(!data) return;
 
             Object.keys(data).reverse().forEach(id => {
                 const v = data[id];
-                // واجهة المستخدم
                 const section = document.createElement('section');
                 section.className = 'v-realm';
                 section.innerHTML = `
-                    <div class="ghost-watermark">AETHER REALM</div>
                     <video id="vid-${id}" loop playsinline src="${v.url}" onclick="this.paused?this.play():this.pause()"></video>
-                    <div class="sidebar-liquid">
-                        <div class="liquid-node" onclick="toggleMute(this, '${id}')"><i class="fas fa-volume-up"></i></div>
-                        <div class="liquid-node" onclick="db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)"><i class="fas fa-bolt text-yellow-400"></i><span>${v.likes || 0}</span></div>
-                    </div>
-                    <div class="realm-meta">
-                        <div class="v-owner">AETHER_SOUL_${id.substring(1,6)}</div> <div class="text-white/20 text-[10px] mt-1 font-bold tracking-[2px]">V13 SECURE STREAM</div>
+                    
+                    <div class="sidebar-actions">
+                        <div class="action-node" onclick="toggleMute(this, '${id}')">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <div class="action-node" onclick="window.open('${AD_LINK}'); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
+                            <i class="fas fa-heart text-red-500"></i>
+                            <span>${v.likes || 0}</span>
+                        </div>
+                        <div class="action-node" onclick="window.open('${AD_LINK}'); toggleChat()">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="action-node" onclick="window.open('${AD_LINK}'); navigator.share({url:window.location.href})">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
                     </div>
                 `;
-                stack.appendChild(section);
+                feed.appendChild(section);
 
-                // قائمة الإدارة
                 const adminItem = document.createElement('div');
-                adminItem.className = 'admin-item';
+                adminItem.className = 'flex justify-between bg-white/5 p-4 rounded-xl border border-white/10';
                 adminItem.innerHTML = `
-                    <span class="text-sm opacity-50">${id}</span>
-                    <button onclick="deleteContent('${id}')" class="text-red-500 font-bold">حذف</button>
+                    <span class="text-xs opacity-40 font-mono">${id}</span>
+                    <button onclick="deleteContent('${id}')" class="text-red-500 text-xs font-bold">REMOVE</button>
                 `;
                 adminList.appendChild(adminItem);
             });
@@ -206,21 +203,21 @@
                 db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
             }
         });
-        document.getElementById("direct-upload").onclick = () => myWidget.open();
+        document.getElementById("up-trigger").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("ENTER MASTER KEY") === MASTER_KEY) toggleAdmin(); }
+        function checkAdmin() { if(prompt("ACCESS_CODE:") === MASTER_KEY) toggleAdmin(); }
         function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
-        function deleteContent(id) { if(confirm("هل أنت متأكد من الحذف؟")) db.ref('vox_god_content/'+id).remove(); }
+        function deleteContent(id) { if(confirm("حذف هذا المقطع نهائياً؟")) db.ref('vox_god_content/'+id).remove(); }
 
         function sendMsg() {
             const inp = document.getElementById('msg-input');
             if(inp.value.trim()) { db.ref('vox_chat').push({text: inp.value}); inp.value=''; }
         }
 
-        db.ref('vox_chat').limitToLast(10).on('value', s => {
+        db.ref('vox_chat').limitToLast(12).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => { box.innerHTML += `<div class="p-4 bg-white/5 rounded-xl border-r-2 border-cyan-500"><p class="text-sm opacity-80">${m.val().text}</p></div>`; });
+            s.forEach(m => { box.innerHTML += `<div class="p-4 bg-white/5 rounded-2xl border-l-2 border-cyan-500"><p class="text-sm opacity-80">${m.val().text}</p></div>`; });
             box.scrollTop = box.scrollHeight;
         });
 
