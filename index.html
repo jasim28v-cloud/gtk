@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VOX_GOD | IONIC PRESTIGE V5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
+        
+        :root {
+            --ionic-cyan: #00ffff;
+            --ionic-magenta: #ff00ff;
+            --bg-obsidian: #020202;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            background: var(--bg-obsidian); 
+            color: #fff; overflow: hidden; 
+            font-family: 'Cairo', sans-serif; 
+            user-select: none; 
+        }
+
+        /* تأثير النيون المتغير في الخلفية */
+        .ionic-glow-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at center, #1a001a 0%, #000 100%);
+        }
+
+        /* محرك التمرير اللانهائي */
+        .scroll-engine {
+            height: 100vh; overflow-y: scroll; 
+            scroll-snap-type: y mandatory; scrollbar-width: none;
+        }
+        .scroll-engine::-webkit-scrollbar { display: none; }
+
+        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* تصميم الزجاج الأيوني المتطور */
+        .glass-ui { 
+            background: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(25px) saturate(180%); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 25px; 
+        }
+
+        /* العلامة المائية الملكية */
+        .watermark { 
+            position: absolute; top: 40px; right: 25px; 
+            font-family: 'Orbitron'; font-size: 16px; 
+            background: linear-gradient(90deg, var(--ionic-cyan), var(--ionic-magenta));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 900; letter-spacing: 3px; z-index: 100; opacity: 0.6;
+        }
+
+        /* أزرار التفاعل الجانبية */
+        .action-sidebar { 
+            position: absolute; right: 20px; bottom: 150px; 
+            display: flex; flex-direction: column; gap: 20px; z-index: 100; 
+        }
+        .action-btn { 
+            width: 55px; height: 55px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; 
+        }
+        .action-btn:hover { transform: scale(1.2); filter: drop-shadow(0 0 15px var(--ionic-cyan)); }
+
+        /* وصف الفيديو الانيق */
+        .v-details { position: absolute; bottom: 130px; left: 25px; right: 90px; z-index: 100; }
+        .v-title { 
+            font-family: 'Orbitron'; font-size: 18px; font-weight: 900; 
+            background: linear-gradient(90deg, #fff, var(--ionic-cyan));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* زر الرفع "النواة" */
+        #up-trigger { 
+            width: 65px; height: 65px; 
+            background: linear-gradient(135deg, var(--ionic-cyan), var(--ionic-magenta)); 
+            color: #000; border-radius: 22px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 28px; box-shadow: 0 0 35px rgba(0, 255, 255, 0.4); 
+            cursor: pointer; transition: 0.4s; 
+        }
+
+        nav { 
+            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 450px; height: 85px; 
+            display: flex; justify-content: space-around; align-items: center; z-index: 200; 
+        }
+
+        /* أنيميشن الهاشتاجات */
+        .hashtag { 
+            font-size: 12px; color: var(--ionic-cyan); 
+            margin-right: 8px; font-weight: bold; 
+            text-shadow: 0 0 5px var(--ionic-cyan);
+        }
+    </style>
+</head>
+<body>
+    <div class="ionic-glow-bg"></div>
+    
+    <header class="fixed top-6 left-6 right-6 z-[500] flex justify-between items-center pointer-events-none">
+        <div class="glass-ui px-6 py-3 pointer-events-auto">
+            <span class="font-[Orbitron] font-black tracking-widest text-[16px] text-[#00ffff]">VOX_GOD ELITE</span>
+        </div>
+        <div class="glass-ui p-3 px-6 font-[Orbitron] text-[13px] text-white" id="clock">00:00:00</div>
+    </header>
+
+    <main class="scroll-engine" id="video-stack"></main>
+
+    <nav class="glass-ui">
+        <div class="cursor-pointer text-white/40 hover:text-white transition" onclick="checkAdmin()">
+            <i class="fas fa-shield-halved text-2xl"></i>
+        </div>
+        <div id="up-trigger"><i class="fas fa-bolt-lightning"></i></div>
+        <div class="cursor-pointer" onclick="openAd(); toggleChat()">
+            <i class="fas fa-comments text-[#00ffff] text-3xl"></i>
+        </div>
+    </nav>
+
+    <div id="chat-ov" class="fixed inset-0 z-[600] bg-black/90 backdrop-blur-3xl hidden flex-col p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="font-[Orbitron] text-[#00ffff] tracking-[6px] text-xl">IONIC_CHAT</h2>
+            <i class="fas fa-xmark text-white/50 text-3xl cursor-pointer" onclick="toggleChat()"></i>
+        </div>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
+        <div class="mt-8 flex gap-4 p-3 glass-ui">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-5 text-sm" placeholder="بث إشارة...">
+            <button onclick="sendMsg()" class="bg-cyan-500 text-black px-10 py-4 rounded-2xl font-black">إرسال</button>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="fixed inset-0 z-[1000] bg-black/98 backdrop-blur-3xl hidden flex-col p-10">
+        <div class="flex justify-between items-center mb-12">
+            <h2 class="font-[Orbitron] text-magenta-500 text-3xl font-black italic">CORE_ADMIN</h2>
+            <button onclick="toggleAdmin()" class="bg-white/5 p-5 rounded-full hover:bg-white/10 transition"><i class="fas fa-times text-2xl"></i></button>
+        </div>
+        <div id="admin-list" class="flex-1 overflow-y-auto space-y-6"></div>
+    </div>
+
+    <script>
+        const MASTER_KEY = "1234";
+        const AD_LINKS = [
+            "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec",
+            "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d"
+        ];
+        let currentAd = 0;
+
+        firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
+        const db = firebase.database();
+
+        function openAd() { window.open(AD_LINKS[currentAd], '_blank'); currentAd = (currentAd + 1) % 2; }
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }
+        setInterval(updateClock, 1000);
+
+        function toggleMute(btn, videoId) {
+            const v = document.getElementById('vid-' + videoId);
+            v.muted = !v.muted;
+            btn.innerHTML = v.muted ? '<i class="fas fa-volume-xmark"></i>' : '<i class="fas fa-volume-high"></i>';
+        }
+
+        db.ref('vox_god_content').on('value', (snap) => {
+            const container = document.getElementById('video-stack');
+            const adminList = document.getElementById('admin-list');
+            const data = snap.val();
+            container.innerHTML = ''; adminList.innerHTML = '';
+            if(!data) return;
+            Object.keys(data).reverse().forEach((id) => {
+                const vid = data[id];
+                const section = document.createElement('section');
+                section.className = 'v-seg';
+                section.innerHTML = `
+                    <div class="watermark text-gradient">VOX_GOD PRESTIGE</div>
+                    <video id="vid-${id}" loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
+                    
+                    <div class="v-details">
+                        <div class="v-title">@IONIC_SIGNAL_${id.substring(1, 5)}</div>
+                        <div class="v-desc mt-2 opacity-80">نظام سحابة VOX_GOD المتطور. تجربة أيونية فائقة الدقة.</div>
+                        <div class="flex mt-4">
+                            <span class="hashtag">#IonicV5</span>
+                            <span class="hashtag">#VoxGod</span>
+                            <span class="hashtag">#Prestige</span>
+                        </div>
+                    </div>
+
+                    <div class="action-sidebar">
+                        <div class="action-btn glass-ui text-white" onclick="toggleMute(this, '${id}')">
+                            <i class="fas fa-volume-high"></i>
+                        </div>
+                        <div class="action-btn glass-ui text-[#00ffff]" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
+                            <i class="fas fa-bolt-lightning text-2xl"></i>
+                            <span>${vid.likes || 0}</span>
+                        </div>
+                        <div class="action-btn glass-ui text-white" onclick="openAd(); toggleChat()">
+                            <i class="fas fa-comment-dots text-xl"></i>
+                        </div>
+                        <div class="action-btn glass-ui text-white" onclick="openAd(); navigator.share({url:window.location.href})">
+                            <i class="fas fa-paper-plane text-xl"></i>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(section);
+                adminList.innerHTML += `
+                    <div class="flex items-center gap-6 glass-ui p-4 mb-4">
+                        <video class="w-24 h-24 rounded-2xl object-cover border border-cyan-500/30" src="${vid.url}"></video>
+                        <div class="flex-1">
+                            <div class="text-[12px] font-mono text-cyan-500">ID: ${id}</div>
+                            <div class="text-[10px] opacity-40 mt-1">${new Date(vid.timestamp).toLocaleString()}</div>
+                        </div>
+                        <button onclick="deleteVideo('${id}')" class="text-red-500 p-5 hover:bg-red-500/10 rounded-full transition"><i class="fas fa-trash-can text-2xl"></i></button>
+                    </div>`;
+            });
+            initObserver();
+        });
+
+        function deleteVideo(id) { if(confirm("هل تريد حذف هذا المحتوى من النواة؟")) db.ref('vox_god_content/' + id).remove(); }
+
+        const myWidget = cloudinary.createUploadWidget({ 
+            cloudName: "dqzjfaqg4", 
+            uploadPreset: "vox_god", 
+            sources: ['local', 'camera'],
+            clientAllowedFormats: ["video"],
+            styles: { 
+                palette: { 
+                    window: "#020202", windowBorder: "#00ffff", tabIcon: "#00ffff", 
+                    menuIcons: "#ffffff", textLight: "#ffffff", textDark: "#000000",
+                    action: "#00ffff", inactiveTabIcon: "#ffffff", error: "#ff0055",
+                    inProgress: "#00ffcc", complete: "#33ff00", sourceBg: "#050505"
+                } 
+            }
+        }, (err, res) => {
+            if (!err && res.event === "success") {
+                db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
+                alert("تم حقن الفيديو بنجاح في النواة الأيونية!");
+            }
+        });
+        document.getElementById("up-trigger").onclick = () => myWidget.open();
+
+        function toggleChat() { 
+            const c = document.getElementById('chat-ov'); 
+            c.style.display = (c.style.display === 'flex') ? 'none' : 'flex'; 
+        }
+        function checkAdmin() { if(prompt("أدخل مفتاح النواة (MASTER_KEY):") === MASTER_KEY) toggleAdmin(); }
+        function toggleAdmin() { 
+            const a = document.getElementById('admin-panel'); 
+            a.style.display = (a.style.display === 'flex') ? 'none' : 'flex'; 
+        }
+        function sendMsg() { 
+            const inp = document.getElementById('msg-input'); 
+            if(inp.value.trim()){ 
+                db.ref('vox_chat').push({user:"VOX_USER", text:inp.value, time: Date.now()}); 
+                inp.value=''; 
+            } 
+        }
+        
+        db.ref('vox_chat').limitToLast(20).on('value', s => {
+            const box = document.getElementById('chat-box'); box.innerHTML = '';
+            s.forEach(m => { 
+                const d = m.val(); 
+                box.innerHTML += `
+                    <div class="p-5 glass-ui mb-3 border-r-4 border-cyan-500 animate-fade-in">
+                        <p class="text-xs text-cyan-400 font-black mb-1">SIGNAL_SOURCE</p>
+                        <p class="text-sm leading-relaxed">${d.text}</p>
+                    </div>`; 
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+
+        function initObserver() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if(e.isIntersecting) v.play().catch(()=>{});
+                    else { v.pause(); v.currentTime = 0; }
+                });
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
+        }
+    </script>
+</body>
+</html>
