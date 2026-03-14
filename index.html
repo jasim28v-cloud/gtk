@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AETHER | SOLARIS V17</title>
+    <title>AETHER | SOLARIS V16</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -15,22 +15,20 @@
         :root {
             --accent: #00ffff;
             --glow: rgba(0, 255, 255, 0.3);
-            --transition-speed: 0.8s;
         }
 
         body, html { 
             margin: 0; padding: 0; height: 100%; 
             background: #000; color: #fff; 
             font-family: 'Cairo', sans-serif; overflow: hidden;
-            transition: background var(--transition-speed);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
         }
 
-        /* خلفية نجمية متغيرة الألوان */
-        .stars-canvas {
+        /* جزيئات الخلفية الكونية */
+        .stars-container {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, #000 100%);
-            transition: box-shadow var(--transition-speed);
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
         }
 
         .scroll-engine {
@@ -48,138 +46,139 @@
 
         video { 
             width: 100%; height: 100%; object-fit: cover;
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-            filter: grayscale(0.5) brightness(0.7);
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1s;
+            filter: brightness(0.8);
         }
 
-        .v-realm.active video { 
-            filter: grayscale(0) brightness(1.1); 
-            transform: scale(1.05);
-            box-shadow: inset 0 0 100px var(--glow);
-        }
+        .v-realm.active video { filter: brightness(1.1); transform: scale(1.02); }
 
-        /* العلامة المائية */
+        /* العلامة المائية العمودية الراقية */
         .side-watermark {
             position: fixed; top: 120px; left: 35px;
             z-index: 1000; pointer-events: none;
             font-family: 'Cinzel', serif;
             font-size: 9px; font-weight: 900;
             letter-spacing: 8px; text-transform: uppercase;
-            color: var(--accent); opacity: 0.5;
+            color: var(--accent); opacity: 0.3;
             writing-mode: vertical-lr; transform: rotate(180deg);
-            transition: color var(--transition-speed);
+            transition: all 0.5s;
         }
 
-        /* الأزرار الجانبية المتزامنة */
+        /* القائمة الجانبية المتوهجة */
         .sidebar-actions {
-            position: absolute; left: 25px; top: 50%;
+            position: absolute; left: 25px; top: 55%;
             transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 20px; z-index: 100;
+            display: flex; flex-direction: column; gap: 22px; z-index: 100;
         }
 
         .action-node {
-            width: 52px; height: 52px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(15px);
+            width: 54px; height: 54px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
+            border-radius: 50%; /* شكل دائري أكثر عصرية */
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.4s all ease;
+            cursor: pointer; transition: 0.4s all;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
-        .action-node i { color: #fff; transition: color var(--transition-speed); font-size: 18px; }
-        .action-node span { font-size: 9px; margin-top: 4px; color: var(--accent); transition: color var(--transition-speed); }
-        
-        /* تأثير التوهج عند النشاط */
-        .v-realm.active .action-node { border-color: var(--accent); box-shadow: 0 0 15px var(--glow); }
+        .action-node:hover { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 20px var(--glow);
+            transform: scale(1.15) translateX(5px);
+        }
+        .action-node i { font-size: 18px; color: #fff; transition: 0.3s; }
+        .action-node span { font-size: 9px; margin-top: 3px; font-weight: 700; color: var(--accent); }
 
-        /* الهيدر المتزامن */
+        /* الهيدر الزجاجي */
         .badge-glass {
-            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(15px);
             padding: 10px 25px; border-radius: 50px; 
-            border: 1px solid var(--accent);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             font-family: 'Cinzel'; font-size: 12px; font-weight: bold;
             letter-spacing: 4px; color: var(--accent);
-            transition: all var(--transition-speed);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* ناف بار سفلي متزامن */
+        /* ناف بار سفلي عائم */
         nav {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 280px; height: 70px;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(30px);
-            border: 1px solid var(--accent);
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 100px; display: flex; justify-content: space-around;
             align-items: center; z-index: 500;
-            transition: border var(--transition-speed);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
         #up-trigger {
             width: 55px; height: 55px;
             background: var(--accent); color: #000;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 22px; transition: all var(--transition-speed);
+            font-size: 22px; transition: 0.4s;
             box-shadow: 0 0 20px var(--glow);
         }
+        #up-trigger:hover { transform: rotate(90deg) scale(1.1); }
 
-        /* لوحة التحكم */
+        /* لوحة التحكم الاحترافية */
         #admin-panel {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000;
-            display: none; flex-direction: column; padding: 40px 20px;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000;
+            display: none; flex-direction: column; padding: 50px 20px;
         }
         .admin-card {
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-            padding: 15px; border-radius: 20px; transition: 0.3s;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            padding: 15px; border-radius: 25px; transition: 0.3s;
         }
-        .admin-thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; border: 1px solid var(--accent); }
+        .admin-card:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); }
+        .admin-thumb { width: 70px; height: 70px; border-radius: 15px; object-fit: cover; }
     </style>
 </head>
 <body>
 
-    <div class="stars-canvas" id="bg-glow"></div>
+    <div class="stars-container"></div>
     <div class="side-watermark" id="dynamic-wm">AETHER_SOLARIS_OS</div>
 
     <div id="admin-panel">
-        <div class="flex justify-between items-center max-w-xl mx-auto w-full mb-10">
-            <h1 class="text-2xl font-[Cinzel] tracking-[10px]" id="admin-title">SYSTEM_CORE</h1>
-            <i class="fas fa-times text-2xl cursor-pointer opacity-40" onclick="toggleAdmin()"></i>
+        <div class="flex justify-between items-center max-w-2xl mx-auto w-full mb-10">
+            <h1 class="text-3xl font-[Cinzel] tracking-widest text-white">CORE_DECK</h1>
+            <i class="fas fa-times text-2xl cursor-pointer text-white/40" onclick="toggleAdmin()"></i>
         </div>
-        <div id="admin-list" class="max-w-xl mx-auto w-full space-y-4 overflow-y-auto"></div>
+        <div id="admin-list" class="max-w-2xl mx-auto w-full space-y-4 overflow-y-auto pr-2"></div>
     </div>
 
     <header class="fixed top-8 w-full flex justify-between px-10 z-[1000] pointer-events-none">
-        <div class="badge-glass pointer-events-auto" id="main-badge">AETHER_V17</div>
-        <div class="badge-glass" id="clock" style="color:white; border-color: rgba(255,255,255,0.1)">00:00</div>
+        <div class="badge-glass pointer-events-auto" id="main-badge">AETHER_V16</div>
+        <div class="badge-glass" id="clock" style="color:white">00:00</div>
     </header>
 
     <main class="scroll-engine" id="video-feed"></main>
 
-    <nav id="bottom-nav">
-        <i class="fas fa-fingerprint text-xl opacity-30 hover:opacity-100 cursor-pointer transition-all" id="admin-btn" onclick="checkAdmin()"></i>
+    <nav>
+        <i class="fas fa-fingerprint text-xl opacity-30 hover:opacity-100 cursor-pointer transition" onclick="checkAdmin()"></i>
         <div id="up-trigger"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-compass text-xl opacity-30 hover:opacity-100 cursor-pointer transition-all" id="chat-btn" onclick="toggleChat()"></i>
+        <i class="fas fa-compass text-xl opacity-30 hover:opacity-100 cursor-pointer text-cyan-400 transition" id="chat-btn" onclick="toggleChat()"></i>
     </nav>
 
     <div id="chat-ov" class="fixed inset-0 z-[600] bg-black hidden flex-col p-10 backdrop-blur-3xl">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Cinzel] tracking-[15px] opacity-20" id="chat-title">NEURAL_LINK</h2>
+            <h2 class="font-[Cinzel] tracking-[15px] text-white/20">NEURAL_LINK</h2>
             <i class="fas fa-times text-2xl cursor-pointer opacity-30" onclick="toggleChat()"></i>
         </div>
-        <div id="chat-box" class="flex-1 overflow-y-auto space-y-6 scrollbar-hide"></div>
-        <div class="mt-8 flex gap-4 p-4 bg-white/5 rounded-3xl border max-w-xl mx-auto w-full transition-all" id="chat-input-container">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-white" placeholder="Transmission pulse...">
-            <button onclick="sendMsg()" id="send-btn" class="bg-white text-black px-8 py-3 rounded-2xl font-black transition-all">EMIT</button>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-6"></div>
+        <div class="mt-8 flex gap-4 p-4 bg-white/5 rounded-3xl border border-white/10 max-w-xl mx-auto w-full">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-white" placeholder="Type a pulse...">
+            <button onclick="sendMsg()" class="bg-white text-black px-10 py-4 rounded-2xl font-black hover:bg-cyan-400 transition">EMIT</button>
         </div>
     </div>
 
     <script>
         const MASTER_KEY = "1234";
         const AD_LINK = "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec";
-        // مصفوفة الألوان الأيونية المتطورة
-        const IONIC_COLORS = ["#00ffff", "#ff00ff", "#00ff88", "#ffcc00", "#ff3366", "#3366ff"];
+        const IONIC_COLORS = ["#00ffff", "#8e44ad", "#2ecc71", "#e67e22", "#e74c3c"];
 
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
 
+        // تحديث الوقت
         setInterval(() => { 
             const now = new Date();
             document.getElementById('clock').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0'); 
@@ -201,10 +200,10 @@
                     <div class="sidebar-actions">
                         <div class="action-node" onclick="toggleMute(this, '${id}')"><i class="fas fa-volume-up"></i></div>
                         <div class="action-node" onclick="window.open('${AD_LINK}'); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
-                            <i class="fas fa-bolt"></i><span>${v.likes || 0}</span>
+                            <i class="fas fa-fire text-orange-500"></i><span>${v.likes || 0}</span>
                         </div>
                         <div class="action-node" onclick="window.open('${AD_LINK}'); toggleChat()"><i class="fas fa-comment-dots"></i></div>
-                        <div class="action-node" onclick="window.open('${AD_LINK}'); navigator.share({url:window.location.href})"><i class="fas fa-expand"></i></div>
+                        <div class="action-node" onclick="window.open('${AD_LINK}'); navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
                     </div>
                 `;
                 feed.appendChild(section);
@@ -212,49 +211,27 @@
                 const adminCard = document.createElement('div');
                 adminCard.className = 'admin-card flex justify-between items-center';
                 adminCard.innerHTML = `
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-5">
                         <video class="admin-thumb" src="${v.url}#t=1"></video>
                         <div>
-                            <p class="text-[9px] text-white/20 font-mono">${id}</p>
-                            <p class="text-xs font-bold" style="color: var(--accent)">ACTIVE_DATA</p>
+                            <p class="text-[10px] text-white/30 font-mono">${id}</p>
+                            <p class="text-xs text-cyan-400 font-bold">ACTIVE_STREAM</p>
                         </div>
                     </div>
-                    <button onclick="deleteContent('${id}')" class="text-red-500 p-3 hover:bg-red-500/10 rounded-full transition"><i class="fas fa-trash"></i></button>
+                    <button onclick="deleteContent('${id}')" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
                 `;
                 adminList.appendChild(adminCard);
             });
             initObserver();
         });
 
-        // نظام المزامنة اللوني الشامل
-        function syncIonicSystem(index) {
+        function updateIonicColor(index) {
             const color = IONIC_COLORS[index % IONIC_COLORS.length];
-            const glow = color + '44';
-            
-            // تحديث متغيرات الـ CSS
             document.documentElement.style.setProperty('--accent', color);
-            document.documentElement.style.setProperty('--glow', glow);
-
-            // تحديث العناصر مباشرة لضمان السلاسة
-            document.getElementById('main-badge').style.borderColor = color;
+            document.documentElement.style.setProperty('--glow', color + '44');
             document.getElementById('main-badge').style.color = color;
             document.getElementById('dynamic-wm').style.color = color;
-            document.getElementById('bottom-nav').style.borderColor = color;
             document.getElementById('up-trigger').style.background = color;
-            document.getElementById('up-trigger').style.boxShadow = `0 0 25px ${glow}`;
-            
-            // أيقونات الناف بار
-            document.getElementById('admin-btn').style.color = color;
-            document.getElementById('chat-btn').style.color = color;
-            
-            // عناصر الشات والمسؤول
-            document.getElementById('chat-title').style.color = color;
-            document.getElementById('chat-input-container').style.borderColor = color;
-            document.getElementById('send-btn').style.background = color;
-            document.getElementById('admin-title').style.color = color;
-            
-            // توهج الخلفية
-            document.getElementById('bg-glow').style.boxShadow = `inset 0 0 150px ${glow}`;
         }
 
         function toggleMute(btn, id) {
@@ -266,7 +243,7 @@
         const myWidget = cloudinary.createUploadWidget({ 
             cloudName: "dqzjfaqg4", uploadPreset: "vox_god",
             sources: ['local'], multiple: false, clientAllowedFormats: ["video"],
-            styles: { palette: { window: "#000", windowBorder: color => color, tabIcon: "#fff", action: "#fff", textLight: "#fff" } }
+            styles: { palette: { window: "#000", windowBorder: "#00ffff", tabIcon: "#00ffff", action: "#ffffff", textLight: "#fff" } }
         }, (err, res) => {
             if (res.event === "success") {
                 db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
@@ -275,9 +252,9 @@
         document.getElementById("up-trigger").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("ENTER_CORE_ACCESS:") === MASTER_KEY) toggleAdmin(); }
+        function checkAdmin() { if(prompt("MASTER_CORE_KEY:") === MASTER_KEY) toggleAdmin(); }
         function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
-        function deleteContent(id) { if(confirm("حذف البيانات نهائياً؟")) db.ref('vox_god_content/'+id).remove(); }
+        function deleteContent(id) { if(confirm("PERMANENT_DELETE?")) db.ref('vox_god_content/'+id).remove(); }
 
         function sendMsg() {
             const inp = document.getElementById('msg-input');
@@ -286,31 +263,26 @@
 
         db.ref('vox_chat').limitToLast(12).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => { 
-                box.innerHTML += `
-                    <div class="p-5 bg-white/5 rounded-3xl border-l-4 max-w-lg mx-auto w-full transition-all" style="border-color: var(--accent)">
-                        <p class="text-sm opacity-80 leading-relaxed">${m.val().text}</p>
-                    </div>`; 
-            });
+            s.forEach(m => { box.innerHTML += `<div class="p-5 bg-white/5 rounded-3xl border-r-4 border-accent animate-pulse-slow max-w-lg mx-auto w-full"><p class="text-sm opacity-80 leading-relaxed">${m.val().text}</p></div>`; });
             box.scrollTop = box.scrollHeight;
         });
 
         function initObserver() {
-            let colorIndex = 0;
+            let sectionIndex = 0;
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting) {
                         e.target.classList.add('active');
                         v.play().catch(()=>{});
-                        colorIndex++;
-                        syncIonicSystem(colorIndex); // مزامنة النظام اللوني بالكامل
+                        sectionIndex++;
+                        updateIonicColor(sectionIndex);
                     } else {
                         e.target.classList.remove('active');
                         v.pause(); v.currentTime = 0;
                     }
                 });
-            }, { threshold: 0.6 });
+            }, { threshold: 0.7 });
             document.querySelectorAll('.v-realm').forEach(s => obs.observe(s));
         }
     </script>
