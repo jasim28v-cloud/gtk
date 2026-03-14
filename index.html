@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AETHER | SOLARIS V16</title>
+    <title>AETHER | SOLARIS V16 PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -12,10 +12,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;900&family=Cairo:wght@300;700&display=swap');
         
-        :root {
-            --accent: #00ffff;
-            --glow: rgba(0, 255, 255, 0.3);
-        }
+        :root { --accent: #00ffff; --glow: rgba(0, 255, 255, 0.3); }
 
         body, html { 
             margin: 0; padding: 0; 
@@ -23,7 +20,6 @@
             background: #000; color: #fff; 
             font-family: 'Cairo', sans-serif; 
             overflow: hidden;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
         }
 
@@ -38,7 +34,8 @@
             scroll-snap-type: y mandatory; 
             scrollbar-width: none;
             position: relative; z-index: 1;
-            will-change: transform; /* تحسين أداء المعالج */
+            scroll-behavior: smooth;
+            will-change: transform;
         }
         .scroll-engine::-webkit-scrollbar { display: none; }
 
@@ -47,9 +44,9 @@
             scroll-snap-align: start; 
             position: relative; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            background: #000;
         }
 
+        /* الحفاظ على أبعاد الفيديو الأصلية كما طلبت */
         video { 
             position: absolute;
             top: 0; left: 0;
@@ -57,8 +54,8 @@
             object-fit: cover;
             transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1s;
             filter: brightness(0.8);
-            opacity: 0; /* مخفي افتراضياً للتحميل السلس */
-            transition: opacity 0.5s ease;
+            opacity: 0; /* للتحميل السلس */
+            transition: opacity 0.8s ease;
         }
 
         .v-realm.active video { filter: brightness(1.1); transform: scale(1.02); opacity: 1; }
@@ -66,8 +63,7 @@
         .side-watermark {
             position: fixed; top: 120px; left: 35px;
             z-index: 1000; pointer-events: none;
-            font-family: 'Cinzel', serif;
-            font-size: 9px; font-weight: 900;
+            font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900;
             letter-spacing: 8px; text-transform: uppercase;
             color: var(--accent); opacity: 0.3;
             writing-mode: vertical-lr; transform: rotate(180deg);
@@ -81,17 +77,10 @@
 
         .action-node {
             width: 54px; height: 54px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; transition: 0.4s all;
-        }
-        .action-node:hover { 
-            border-color: var(--accent); 
-            box-shadow: 0 0 20px var(--glow);
-            transform: scale(1.1) translateX(5px);
         }
 
         .badge-glass {
@@ -122,10 +111,6 @@
             position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000;
             display: none; flex-direction: column; padding: 40px 20px; overflow-y: auto;
         }
-        .admin-card {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 12px; border-radius: 20px; margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
@@ -136,7 +121,7 @@
     <div id="admin-panel">
         <div class="flex justify-between items-center max-w-2xl mx-auto w-full mb-8">
             <h1 class="text-2xl font-[Cinzel] tracking-widest text-white">CORE_DECK</h1>
-            <div class="text-[10px] opacity-40">ONLINE: <span id="visitor-count">0</span></div>
+            <div class="text-[10px] text-cyan-400">ONLINE: <span id="visitor-count">0</span></div>
             <i class="fas fa-times text-2xl cursor-pointer text-white/40" onclick="toggleAdmin()"></i>
         </div>
         <div id="admin-list" class="max-w-2xl mx-auto w-full space-y-4"></div>
@@ -152,7 +137,7 @@
     <nav>
         <i class="fas fa-fingerprint text-xl opacity-30 hover:opacity-100 cursor-pointer transition" onclick="checkAdmin()"></i>
         <div id="up-trigger"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-compass text-xl opacity-30 hover:opacity-100 cursor-pointer text-cyan-400 transition" id="chat-btn" onclick="toggleChatWithAd()"></i>
+        <i class="fas fa-compass text-xl opacity-30 hover:opacity-100 cursor-pointer text-cyan-400 transition" onclick="toggleChatWithAd()"></i>
     </nav>
 
     <div id="chat-ov" class="fixed inset-0 z-[600] bg-black hidden flex-col p-10 backdrop-blur-3xl">
@@ -175,30 +160,28 @@
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
         const USR_ID = "ELITE-" + Math.floor(Math.random()*999);
-        let videoDataCache = null;
+        let videoCache = null;
 
-        // نظام الزوار
+        // نظام الزوار (Live Presence)
         const presenceRef = db.ref('presence/' + USR_ID);
         presenceRef.set(true);
         presenceRef.onDisconnect().remove();
-        db.ref('presence').on('value', s => { 
-            if(document.getElementById('visitor-count')) document.getElementById('visitor-count').innerText = s.numChildren(); 
-        });
+        db.ref('presence').on('value', s => { if(document.getElementById('visitor-count')) document.getElementById('visitor-count').innerText = s.numChildren(); });
 
         setInterval(() => { 
             const now = new Date();
             document.getElementById('clock').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0'); 
         }, 1000);
 
-        function openAd() { window.open(AD_LINK, '_blank'); }
-        function toggleChatWithAd() { openAd(); toggleChat(); }
+        function fireAd() { window.open(AD_LINK, '_blank'); }
+        function toggleChatWithAd() { fireAd(); toggleChat(); }
 
         // محرك البيانات المسرع
         db.ref('vox_god_content').on('value', snap => {
             const feed = document.getElementById('video-feed');
             const data = snap.val();
             if(!data) return;
-            videoDataCache = data;
+            videoCache = data;
 
             feed.innerHTML = '';
             const fragment = document.createDocumentFragment();
@@ -210,11 +193,11 @@
                     <video id="vid-${id}" loop playsinline muted data-src="${v.url}" onclick="this.paused?this.play():this.pause()"></video>
                     <div class="sidebar-actions">
                         <div class="action-node" onclick="toggleMute(this, '${id}')"><i class="fas fa-volume-mute"></i></div>
-                        <div class="action-node" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
+                        <div class="action-node" onclick="fireAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
                             <i class="fas fa-fire text-orange-500"></i><span>${v.likes || 0}</span>
                         </div>
                         <div class="action-node" onclick="toggleChatWithAd()"><i class="fas fa-comment-dots"></i></div>
-                        <div class="action-node" onclick="openAd(); navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
+                        <div class="action-node" onclick="fireAd(); navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
                     </div>`;
                 fragment.appendChild(section);
             });
@@ -222,16 +205,15 @@
             initObserver();
         });
 
-        // بناء قائمة الإدارة فقط عند الحاجة لزيادة السرعة
         function renderAdminList() {
             const list = document.getElementById('admin-list');
             list.innerHTML = '';
-            Object.keys(videoDataCache).reverse().forEach(id => {
-                const v = videoDataCache[id];
+            Object.keys(videoCache).reverse().forEach(id => {
+                const v = videoCache[id];
                 list.innerHTML += `
-                    <div class="admin-card flex justify-between items-center">
+                    <div class="admin-card flex justify-between items-center bg-white/5 p-4 rounded-2xl">
                         <div class="flex items-center gap-4">
-                            <img class="w-12 h-16 rounded-lg object-cover bg-white/5" src="${v.url.replace('.mp4', '.jpg')}">
+                            <img class="w-12 h-16 rounded-lg object-cover" src="${v.url.replace('.mp4', '.jpg')}">
                             <span class="text-[10px] opacity-30 font-mono">${id.substring(0,10)}</span>
                         </div>
                         <button onclick="deleteContent('${id}')" class="text-red-500 p-4"><i class="fas fa-trash-alt"></i></button>
@@ -239,25 +221,26 @@
             });
         }
 
-        function checkAdmin() { if(prompt("MASTER_CORE_KEY:") === MASTER_KEY) { renderAdminList(); toggleAdmin(); } }
-        function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
-        function deleteContent(id) { if(confirm("حذف؟")) { db.ref('vox_god_content/'+id).remove(); setTimeout(renderAdminList, 300); } }
-
         function toggleMute(btn, id) {
             const v = document.getElementById('vid-'+id);
             v.muted = !v.muted;
             btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
         }
 
-        const myWidget = cloudinary.createUploadWidget({ 
-            cloudName: "dqzjfaqg4", uploadPreset: "vox_god", styles: { palette: { window: "#000", windowBorder: "#00ffff", tabIcon: "#00ffff", action: "#ffffff", textLight: "#fff" } }
-        }, (err, res) => {
+        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god" }, (err, res) => {
             if (res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()) { db.ref('vox_chat').push({text: inp.value}); inp.value=''; } }
+        function checkAdmin() { if(prompt("MASTER_CORE_KEY:") === MASTER_KEY) { renderAdminList(); toggleAdmin(); } }
+        function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
+        function deleteContent(id) { if(confirm("PERMANENT_DELETE?")) { db.ref('vox_god_content/'+id).remove(); setTimeout(renderAdminList, 300); } }
+
+        function sendMsg() {
+            const inp = document.getElementById('msg-input');
+            if(inp.value.trim()) { db.ref('vox_chat').push({text: inp.value}); inp.value=''; }
+        }
 
         db.ref('vox_chat').limitToLast(12).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
@@ -271,17 +254,14 @@
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting) {
-                        if(!v.src) v.src = v.dataset.src; // التحميل عند الظهور فقط
+                        if(!v.src) v.src = v.dataset.src; // تحميل عند الظهور فقط
                         e.target.classList.add('active');
                         v.play().catch(()=>{});
                         idx++;
                         const color = IONIC_COLORS[idx % IONIC_COLORS.length];
                         document.documentElement.style.setProperty('--accent', color);
                         document.getElementById('main-badge').style.color = color;
-                    } else {
-                        e.target.classList.remove('active');
-                        v.pause();
-                    }
+                    } else { e.target.classList.remove('active'); v.pause(); }
                 });
             }, { threshold: 0.65 });
             document.querySelectorAll('.v-realm').forEach(s => obs.observe(s));
