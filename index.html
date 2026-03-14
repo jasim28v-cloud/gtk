@@ -14,11 +14,11 @@
         :root { --accent: #00ffff; --glow: rgba(0, 255, 255, 0.3); }
         body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; background: #000; color: #fff; font-family: 'Cairo', sans-serif; overflow: hidden; user-select: none; }
         .stars-container { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(circle at center, #111 0%, #000 100%); }
-        .scroll-engine { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; z-index: 1; }
+        .scroll-engine { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; z-index: 1; scroll-behavior: smooth; }
         .scroll-engine::-webkit-scrollbar { display: none; }
         .v-realm { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 1s; filter: brightness(0.7); opacity: 0; transition: opacity 0.8s; }
-        .v-realm.active video { filter: brightness(1.1); opacity: 1; }
+        video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1s; filter: brightness(0.7); opacity: 0; transition: opacity 0.8s; }
+        .v-realm.active video { filter: brightness(1.1); transform: scale(1.02); opacity: 1; }
         .side-watermark { position: fixed; top: 120px; left: 35px; z-index: 1000; pointer-events: none; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900; letter-spacing: 8px; text-transform: uppercase; color: var(--accent); opacity: 0.3; writing-mode: vertical-lr; transform: rotate(180deg); }
         .sidebar-actions { position: absolute; left: 25px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 22px; z-index: 100; }
         .action-node { width: 54px; height: 54px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.4s all; }
@@ -26,7 +26,6 @@
         nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 280px; height: 70px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 100px; display: flex; justify-content: space-around; align-items: center; z-index: 500; }
         #up-trigger { width: 55px; height: 55px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: 0.4s; }
         #admin-panel { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; padding: 40px 20px; overflow-y: auto; }
-        .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 20px; margin-bottom: 10px; }
         .stat-badge { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 25px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
@@ -41,8 +40,8 @@
             <i class="fas fa-times text-2xl cursor-pointer text-white/40" onclick="toggleAdmin()"></i>
         </div>
         <div class="grid grid-cols-2 gap-4 max-w-2xl mx-auto w-full mb-6">
-            <div class="stat-badge"><div class="text-[10px] opacity-40 uppercase">Visitors Now</div><div class="text-2xl font-[Cinzel] text-cyan-400" id="live-users">0</div></div>
-            <div class="stat-badge"><div class="text-[10px] opacity-40 uppercase">Total Nodes</div><div class="text-2xl font-[Cinzel] text-pink-500" id="total-nodes">0</div></div>
+            <div class="stat-badge"><div class="text-[10px] opacity-40 uppercase">Signals_Active</div><div class="text-2xl font-[Cinzel] text-cyan-400" id="live-users">0</div></div>
+            <div class="stat-badge"><div class="text-[10px] opacity-40 uppercase">Total_Nodes</div><div class="text-2xl font-[Cinzel] text-pink-500" id="total-nodes">0</div></div>
         </div>
         <div id="admin-list" class="max-w-2xl mx-auto w-full space-y-4"></div>
     </div>
@@ -61,13 +60,10 @@
     </nav>
 
     <div id="chat-ov" class="fixed inset-0 z-[600] bg-black hidden flex-col p-10 backdrop-blur-3xl">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Cinzel] tracking-[15px] text-white/20">NEURAL_LINK</h2>
-            <i class="fas fa-times text-2xl cursor-pointer opacity-30" onclick="toggleChat()"></i>
-        </div>
+        <div class="flex justify-between items-center mb-10"><h2 class="font-[Cinzel] tracking-[15px] text-white/20">NEURAL_LINK</h2><i class="fas fa-times text-2xl cursor-pointer opacity-30" onclick="toggleChat()"></i></div>
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-6"></div>
         <div class="mt-8 flex gap-4 p-4 bg-white/5 rounded-3xl border border-white/10 max-w-xl mx-auto w-full">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-white" placeholder="Type a pulse...">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-white" placeholder="Emit a pulse...">
             <button onclick="sendMsg()" class="bg-white text-black px-10 py-4 rounded-2xl font-black">EMIT</button>
         </div>
     </div>
@@ -80,9 +76,9 @@
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
         const USR_ID = "NODE-" + Math.floor(Math.random()*999);
-        let cachedContent = null;
+        let cachedData = null;
 
-        // نظام حضور الأشباح (Presence)
+        // نظام الحضور الحي
         const presenceRef = db.ref('presence/' + USR_ID);
         presenceRef.set(true);
         presenceRef.onDisconnect().remove();
@@ -100,7 +96,7 @@
             const feed = document.getElementById('video-feed');
             const data = snap.val();
             if(!data) return;
-            cachedContent = data;
+            cachedData = data;
             document.getElementById('total-nodes').innerText = Object.keys(data).length;
             
             feed.innerHTML = '';
@@ -128,16 +124,9 @@
         function renderAdmin() {
             const list = document.getElementById('admin-list');
             list.innerHTML = '';
-            Object.keys(cachedContent).reverse().forEach(id => {
-                const v = cachedContent[id];
-                list.innerHTML += `
-                    <div class="admin-card flex justify-between items-center">
-                        <div class="flex items-center gap-4">
-                            <img class="w-12 h-16 rounded-lg object-cover bg-white/5" src="${v.url.replace('.mp4', '.jpg')}">
-                            <div><p class="text-[10px] opacity-30 font-mono">${id.substring(0,10)}</p><p class="text-xs text-cyan-400 font-bold">NODE_SYNC</p></div>
-                        </div>
-                        <button onclick="deleteContent('${id}')" class="text-red-500 p-4"><i class="fas fa-trash-alt"></i></button>
-                    </div>`;
+            Object.keys(cachedData).reverse().forEach(id => {
+                const v = cachedData[id];
+                list.innerHTML += `<div class="bg-white/5 p-4 rounded-3xl flex justify-between items-center border border-white/5"><div class="flex items-center gap-4"><img class="w-12 h-16 rounded-lg object-cover" src="${v.url.replace('.mp4', '.jpg')}"><div><p class="text-[10px] opacity-30 font-mono">${id.substring(0,10)}</p><p class="text-xs text-cyan-400 font-bold uppercase">NODE_SYNC</p></div></div><button onclick="deleteContent('${id}')" class="text-red-500 p-4"><i class="fas fa-trash-alt"></i></button></div>`;
             });
         }
 
@@ -147,10 +136,7 @@
             btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
         }
 
-        const myWidget = cloudinary.createUploadWidget({ 
-            cloudName: "dqzjfaqg4", uploadPreset: "vox_god",
-            styles: { palette: { window: "#000", windowBorder: "#00ffff", tabIcon: "#00ffff", action: "#ffffff", textLight: "#fff" } }
-        }, (err, res) => {
+        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god" }, (err, res) => {
             if (res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
@@ -158,13 +144,9 @@
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
         function checkAdmin() { if(prompt("MASTER_CORE_KEY:") === MASTER_KEY) { renderAdmin(); toggleAdmin(); } }
         function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
-        function deleteContent(id) { if(confirm("PERMANENT_DELETE?")) { db.ref('vox_god_content/'+id).remove(); setTimeout(renderAdmin, 300); } }
+        function deleteContent(id) { if(confirm("حذف؟")) { db.ref('vox_god_content/'+id).remove(); setTimeout(renderAdmin, 300); } }
 
-        function sendMsg() {
-            const inp = document.getElementById('msg-input');
-            if(inp.value.trim()) { db.ref('vox_chat').push({text: inp.value}); inp.value=''; }
-        }
-
+        function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()){ db.ref('vox_chat').push({text: inp.value}); inp.value=''; } }
         db.ref('vox_chat').limitToLast(12).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
             s.forEach(m => { box.innerHTML += `<div class="p-5 bg-white/5 rounded-3xl border-r-4 border-accent max-w-lg mx-auto w-full"><p class="text-sm opacity-80">${m.val().text}</p></div>`; });
@@ -172,23 +154,20 @@
         });
 
         function initObserver() {
-            let sectionIndex = 0;
+            let idx = 0;
             const obs = new IntersectionObserver(es => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting) {
-                        if(!v.src) v.src = v.dataset.src;
+                        if(!v.src) v.src = v.dataset.src; // السرعة القصوى: تحميل عند الحاجة
                         e.target.classList.add('active');
                         v.play().catch(()=>{});
-                        sectionIndex++;
-                        const color = IONIC_COLORS[sectionIndex % IONIC_COLORS.length];
+                        idx++;
+                        const color = IONIC_COLORS[idx % IONIC_COLORS.length];
                         document.documentElement.style.setProperty('--accent', color);
                         document.getElementById('main-badge').style.color = color;
                         document.getElementById('up-trigger').style.background = color;
-                    } else {
-                        e.target.classList.remove('active');
-                        v.pause();
-                    }
+                    } else { e.target.classList.remove('active'); v.pause(); }
                 });
             }, { threshold: 0.65 });
             document.querySelectorAll('.v-realm').forEach(s => obs.observe(s));
